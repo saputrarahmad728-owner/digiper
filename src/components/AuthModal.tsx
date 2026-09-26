@@ -20,31 +20,6 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onLoginSu
 
   if (!isOpen) return null;
 
-  // Handle Demo Quick Login (untuk kemudahan pengujian lokal)
-  const handleQuickDemoLogin = (pakarIndex: number) => {
-    const demoExperts: ExpertUser[] = [
-      {
-        id: 'expert-demo-1',
-        email: 'bambang@ipb.ac.id',
-        name: 'Ir. Bambang Trihatmojo, M.Sc.',
-        title: 'Agronom & Pakar Proteksi Tanaman (IPB)',
-        avatar: ''
-      },
-      {
-        id: 'expert-demo-2',
-        email: 'sri.mulyani@pertanian.go.id',
-        name: 'Dr. Ir. Sri Mulyani, M.P.',
-        title: 'Pakar Mikrobiologi & Pupuk Hayati',
-        avatar: ''
-      }
-    ];
-
-    const chosen = demoExperts[pakarIndex] || demoExperts[0];
-    setStoredExpertUser(chosen);
-    onLoginSuccess(chosen);
-    onClose();
-  };
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMsg('');
@@ -335,30 +310,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onLoginSu
             </button>
           </form>
 
-          {/* Quick Demo Switcher untuk pengujian lokal cepat */}
-          <div style={{ borderTop: '1px solid #e2e8f0', paddingTop: '10px', marginTop: '4px' }}>
-            <div style={{ fontSize: '0.78rem', color: '#64748b', textAlign: 'center', marginBottom: '8px' }}>
-              Atau coba langsung dengan akun simulasi cepat:
-            </div>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
-              <button
-                type="button"
-                className="btn-outline"
-                onClick={() => handleQuickDemoLogin(0)}
-                style={{ fontSize: '0.76rem', padding: '6px 8px', textAlign: 'center' }}
-              >
-                Masuk: Ir. Bambang
-              </button>
-              <button
-                type="button"
-                className="btn-outline"
-                onClick={() => handleQuickDemoLogin(1)}
-                style={{ fontSize: '0.76rem', padding: '6px 8px', textAlign: 'center' }}
-              >
-                Masuk: Dr. Sri Mulyani
-              </button>
-            </div>
-          </div>
+
         </div>
       </div>
     </div>
