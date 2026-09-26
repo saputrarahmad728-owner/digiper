@@ -761,33 +761,78 @@ input, textarea, select {
 /* Tingkat Urgensi */
 .urgency-options {
   display: flex;
-  gap: 14px;
+  gap: 10px;
   flex-wrap: wrap;
 }
 
 .urgency-label {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
   font-size: 0.88rem;
+  padding: 8px 14px;
+  border-radius: var(--radius-md);
+  border: 1.5px solid var(--border-light);
+  background: #f8fafc;
   cursor: pointer;
+  transition: all var(--transition-fast);
+  user-select: none;
+}
+
+.urgency-label:hover {
+  background: #f1f5f9;
+  border-color: var(--primary-300);
+}
+
+.urgency-label input[type="radio"] {
+  accent-color: var(--primary-600);
+  cursor: pointer;
+  width: 16px;
+  height: 16px;
+}
+
+.urgency-label.active {
+  background-color: #f0fdf4;
+  border-color: var(--primary-500);
+  color: var(--primary-900);
+  font-weight: 700;
 }
 
 .urgency-label.urgent {
   color: #dc2626;
-  font-weight: 600;
+}
+
+.urgency-label.urgent input[type="radio"] {
+  accent-color: #dc2626;
+}
+
+.urgency-label.urgent.active {
+  background-color: #fef2f2;
+  border-color: #f87171;
+  color: #dc2626;
+  font-weight: 700;
 }
 
 .form-actions {
   display: flex;
+  flex-direction: row-reverse;
   align-items: center;
   justify-content: space-between;
-  margin-top: 0.5rem;
+  gap: 16px;
+  margin-top: 1rem;
+}
+
+.btn-submit-ask {
+  min-width: 220px;
+  padding: 11px 24px;
+  font-size: 0.95rem;
+  box-shadow: 0 4px 14px rgba(22, 163, 74, 0.3);
 }
 
 .form-helper {
-  font-size: 0.8rem;
+  font-size: 0.84rem;
   color: var(--text-muted);
+  line-height: 1.4;
 }
 
 /* ================= DAFTAR KASUS TANI ================= */
@@ -1566,6 +1611,41 @@ input, textarea, select {
     grid-template-columns: 1fr;
   }
 
+  .urgency-options {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .urgency-label {
+    width: 100%;
+    padding: 10px 14px;
+    font-size: 0.88rem;
+  }
+
+  .form-actions {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+    margin-top: 0.85rem;
+  }
+
+  .btn-submit-ask {
+    width: 100%;
+    min-width: 0;
+    justify-content: center;
+    padding: 13px 20px;
+    font-size: 0.95rem;
+    border-radius: var(--radius-full);
+  }
+
+  .form-helper {
+    text-align: center;
+    font-size: 0.8rem;
+    line-height: 1.4;
+    padding: 0 4px;
+  }
+
   .articles-grid {
     grid-template-columns: 1fr;
   }
@@ -1741,4 +1821,139 @@ mark.search-highlight {
 .btn-reset-search:hover {
   background-color: #047857;
   color: #ffffff;
+}
+
+/* ================= LIGHTBOX / IMAGE ZOOM MODAL ================= */
+.image-lightbox-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(5, 10, 8, 0.92);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  z-index: 999;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  animation: fadeIn 0.2s ease-out;
+  overflow: hidden;
+  user-select: none;
+  touch-action: none;
+}
+
+.lightbox-toolbar {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  z-index: 1000;
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0.65) 0%, transparent 100%);
+}
+
+.lightbox-zoom-controls {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  padding: 4px 8px;
+  border-radius: var(--radius-full);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.lightbox-btn {
+  width: 38px;
+  height: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+  border-radius: 50%;
+  background: transparent;
+  transition: all var(--transition-fast);
+}
+
+.lightbox-btn:hover {
+  background: rgba(255, 255, 255, 0.25);
+  transform: scale(1.08);
+}
+
+.lightbox-btn:active {
+  transform: scale(0.95);
+}
+
+.lightbox-close-btn {
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.lightbox-close-btn:hover {
+  background: rgba(239, 68, 68, 0.85);
+  border-color: rgba(239, 68, 68, 0.9);
+}
+
+.lightbox-zoom-level {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #ffffff;
+  min-width: 48px;
+  text-align: center;
+  cursor: pointer;
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.lightbox-zoom-level:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.lightbox-stage {
+  flex: 1;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.lightbox-image {
+  max-width: 90vw;
+  max-height: 75vh;
+  object-fit: contain;
+  border-radius: 8px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+.lightbox-caption {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 12px 20px 20px 20px;
+  background: linear-gradient(0deg, rgba(0, 0, 0, 0.7) 0%, transparent 100%);
+  text-align: center;
+  z-index: 1000;
+  gap: 4px;
+}
+
+.lightbox-caption-text {
+  color: #ffffff;
+  font-size: 0.95rem;
+  font-weight: 700;
+  max-width: 600px;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
+}
+
+.lightbox-hint {
+  color: rgba(255, 255, 255, 0.65);
+  font-size: 0.76rem;
 }

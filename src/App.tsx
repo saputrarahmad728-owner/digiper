@@ -9,6 +9,7 @@ import { AnswerFormModal } from './components/AnswerFormModal';
 import { AuthModal } from './components/AuthModal';
 import { Footer } from './components/Footer';
 import { SupabaseModal } from './components/SupabaseModal';
+import { ImageModal } from './components/ImageModal';
 import { Question, NewQuestionInput, ExpertUser } from './types';
 import {
   fetchQuestionsFromDB,
@@ -32,6 +33,7 @@ export const App: React.FC = () => {
   const [questionToAnswer, setQuestionToAnswer] = useState<Question | null>(null);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState<boolean>(false);
   const [isSupabaseModalOpen, setIsSupabaseModalOpen] = useState<boolean>(false);
+  const [zoomedImage, setZoomedImage] = useState<{ url: string; title: string } | null>(null);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
   // Authenticated Expert State (Khusus yang ingin menjawab pertanyaan)
@@ -380,6 +382,7 @@ export const App: React.FC = () => {
                       searchQuery={searchQuery}
                       onOpenAnswer={(item) => setActiveModalQuestion(item)}
                       onRequestAnswer={(item) => handleRequestAnswer(item)}
+                      onOpenImage={(url, title) => setZoomedImage({ url, title })}
                     />
                   ))}
                 </div>
@@ -400,6 +403,7 @@ export const App: React.FC = () => {
         onClose={() => setActiveModalQuestion(null)}
         onLikeAnswer={handleLikeAnswer}
         onRequestAnswer={(q) => handleRequestAnswer(q)}
+        onOpenImage={(url, title) => setZoomedImage({ url, title })}
       />
 
       {/* 8. Modal Menulis Jawaban Pakar (Khusus Expert) */}
@@ -428,7 +432,15 @@ export const App: React.FC = () => {
         onClose={() => setIsSupabaseModalOpen(false)}
       />
 
-      {/* 11. Floating Toast Notification */}
+      {/* 11. Modal Zoom In / Zoom Out Foto Gejala Tanaman */}
+      <ImageModal
+        isOpen={Boolean(zoomedImage)}
+        imageUrl={zoomedImage?.url || null}
+        imageAlt={zoomedImage?.title || 'Foto Gejala Tanaman'}
+        onClose={() => setZoomedImage(null)}
+      />
+
+      {/* 12. Floating Toast Notification */}
       {toastMessage && (
         <div className="toast-notice">
           <Sparkles size={18} className="text-amber-400" />

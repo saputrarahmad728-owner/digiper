@@ -10,6 +10,7 @@ interface AnswerModalProps {
   onClose: () => void;
   onLikeAnswer: (answerId: string, currentLikes: number) => Promise<void>;
   onRequestAnswer: (question: Question) => void;
+  onOpenImage?: (imageUrl: string, title: string) => void;
 }
 
 export const AnswerModal: React.FC<AnswerModalProps> = ({
@@ -18,7 +19,8 @@ export const AnswerModal: React.FC<AnswerModalProps> = ({
   searchQuery = '',
   onClose,
   onLikeAnswer,
-  onRequestAnswer
+  onRequestAnswer,
+  onOpenImage
 }) => {
   const [hasLiked, setHasLiked] = useState(false);
   const [isLiking, setIsLiking] = useState(false);
@@ -98,21 +100,39 @@ export const AnswerModal: React.FC<AnswerModalProps> = ({
             {/* Foto Gejala Tanaman dari Petani */}
             {question.image_url && (
               <div style={{ marginTop: '14px' }}>
-                <span style={{ fontSize: '0.78rem', fontWeight: 700, color: '#64748b', display: 'block', marginBottom: '6px' }}>
-                  📸 Foto Gejala yang Diunggah Petani:
+                <span style={{ fontSize: '0.78rem', fontWeight: 700, color: '#64748b', display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '6px' }}>
+                  <span>📸 Foto Gejala yang Diunggah Petani:</span>
+                  <span style={{ color: '#16a34a', fontSize: '0.74rem' }}>Klik foto untuk Zoom In/Out</span>
                 </span>
-                <img
-                  src={question.image_url}
-                  alt={question.title}
+                <div
                   style={{
-                    maxWidth: '100%',
-                    maxHeight: '340px',
+                    position: 'relative',
+                    cursor: 'zoom-in',
+                    display: 'inline-block',
                     borderRadius: '12px',
-                    border: '1px solid #cbd5e1',
-                    objectFit: 'contain',
-                    backgroundColor: '#0000000d'
+                    overflow: 'hidden'
                   }}
-                />
+                  onClick={() => onOpenImage && onOpenImage(question.image_url!, question.title)}
+                  title="Klik untuk memperbesar gambar"
+                >
+                  <img
+                    src={question.image_url}
+                    alt={question.title}
+                    style={{
+                      maxWidth: '100%',
+                      maxHeight: '340px',
+                      borderRadius: '12px',
+                      border: '1px solid #cbd5e1',
+                      objectFit: 'contain',
+                      backgroundColor: '#0000000d',
+                      display: 'block'
+                    }}
+                    onError={(e) => {
+                      const target = e.currentTarget.parentElement?.parentElement;
+                      if (target) target.style.display = 'none';
+                    }}
+                  />
+                </div>
               </div>
             )}
           </div>

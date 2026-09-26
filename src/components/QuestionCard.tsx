@@ -1,5 +1,5 @@
 import React from 'react';
-import { Eye, ThumbsUp, CheckCircle, Clock, ArrowRight, MessageSquareHeart, Image as ImageIcon } from 'lucide-react';
+import { Eye, ThumbsUp, CheckCircle, Clock, ArrowRight, MessageSquareHeart, ZoomIn } from 'lucide-react';
 import { Question, ExpertUser } from '../types';
 import { getInitials, HighlightText } from '../lib/avatar';
 
@@ -9,6 +9,7 @@ interface QuestionCardProps {
   searchQuery?: string;
   onOpenAnswer: (question: Question) => void;
   onRequestAnswer: (question: Question) => void;
+  onOpenImage?: (imageUrl: string, title: string) => void;
 }
 
 export const QuestionCard: React.FC<QuestionCardProps> = ({
@@ -16,7 +17,8 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
   currentExpert,
   searchQuery = '',
   onOpenAnswer,
-  onRequestAnswer
+  onRequestAnswer,
+  onOpenImage
 }) => {
   const isAnswered = question.status === 'answered' && Boolean(question.answer);
   const initial = question.farmer_name ? question.farmer_name.charAt(0).toUpperCase() : 'P';
@@ -58,18 +60,33 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
         <HighlightText text={question.content} query={searchQuery} />
       </p>
 
-      {/* Tampilan Gambar Tanaman jika ada */}
+      {/* Tampilan Gambar Tanaman jika ada (Bisa diklik untuk Zoom In / Out) */}
       {question.image_url && (
-        <div className="card-image-wrap" onClick={() => onOpenAnswer(question)}>
+        <div
+          className="card-image-wrap"
+          onClick={(e) => {
+            e.stopPropagation();
+            if (onOpenImage) {
+              onOpenImage(question.image_url!, question.title);
+            } else {
+              onOpenAnswer(question);
+            }
+          }}
+          title="Klik untuk melihat foto lebih jelas (Zoom In / Out)"
+        >
           <img
             src={question.image_url}
             alt={question.title}
             className="card-plant-image"
             loading="lazy"
+            onError={(e) => {
+              const target = e.currentTarget.parentElement;
+              if (target) target.style.display = 'none';
+            }}
           />
           <span className="card-image-badge">
-            <ImageIcon size={12} />
-            <span>Foto Gejala</span>
+            <ZoomIn size={12} />
+            <span>Klik Zoom Foto</span>
           </span>
         </div>
       )}

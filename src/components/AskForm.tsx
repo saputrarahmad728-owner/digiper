@@ -258,7 +258,7 @@ export const AskForm: React.FC<AskFormProps> = ({ onSubmitQuestion, defaultCateg
         <div className="form-group">
           <label className="form-label">Tingkat Urgensi Masalah:</label>
           <div className="urgency-options">
-            <label className="urgency-label">
+            <label className={`urgency-label ${urgency === 'rendah' ? 'active' : ''}`}>
               <input
                 type="radio"
                 name="urgency"
@@ -268,7 +268,7 @@ export const AskForm: React.FC<AskFormProps> = ({ onSubmitQuestion, defaultCateg
               />
               <span>Rendah (Pencegahan)</span>
             </label>
-            <label className="urgency-label">
+            <label className={`urgency-label ${urgency === 'sedang' ? 'active' : ''}`}>
               <input
                 type="radio"
                 name="urgency"
@@ -278,7 +278,7 @@ export const AskForm: React.FC<AskFormProps> = ({ onSubmitQuestion, defaultCateg
               />
               <span>Sedang (Gejala Awal)</span>
             </label>
-            <label className="urgency-label urgent">
+            <label className={`urgency-label urgent ${urgency === 'mendesak' ? 'active' : ''}`}>
               <input
                 type="radio"
                 name="urgency"
@@ -308,19 +308,18 @@ export const AskForm: React.FC<AskFormProps> = ({ onSubmitQuestion, defaultCateg
 
         {/* Tombol Kirim */}
         <div className="form-actions">
-          <span className="form-helper">
-            🌾 Pertanyaan langsung tersimpan ke Supabase dan tampil di daftar konsultasi.
-          </span>
           <button
             type="submit"
-            className="btn-primary"
+            className="btn-primary btn-submit-ask"
             disabled={loading}
             id="btn-kirim-pertanyaan"
-            style={{ minWidth: '220px', display: 'flex', justifyContent: 'center' }}
           >
             <Send size={16} className={loading ? 'animate-pulse' : ''} />
             <span>{loading ? 'Menyimpan ke Database...' : 'Kirim Pertanyaan Petani'}</span>
           </button>
+          <span className="form-helper">
+            🌾 Pertanyaan langsung tersimpan ke Supabase dan tampil di daftar konsultasi.
+          </span>
         </div>
       </form>
     </div>
