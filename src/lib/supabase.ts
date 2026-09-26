@@ -1,8 +1,12 @@
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
 import { Question, NewQuestionInput, ExpertUser, Answer } from '../types';
 
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || '';
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || '';
+// Kredensial Supabase Tanya Tani
+const DEFAULT_SUPABASE_URL = 'https://dmajjfazaivpmvsnrvqe.supabase.co';
+const DEFAULT_SUPABASE_ANON_KEY = 'sb_publishable_cDRa4oHwRRkQer0jjSGDTA_Fyvxp6kb';
+
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || DEFAULT_SUPABASE_URL;
+const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || DEFAULT_SUPABASE_ANON_KEY;
 
 export const isSupabaseConfigured = (): boolean => {
   return Boolean(

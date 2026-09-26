@@ -16,7 +16,8 @@ import {
   submitExpertAnswer,
   likeAnswerInDB,
   getStoredExpertUser,
-  setStoredExpertUser
+  setStoredExpertUser,
+  supabase
 } from './lib/supabase';
 import { MessageSquare, Sparkles, FilterX } from 'lucide-react';
 
@@ -38,8 +39,8 @@ export const App: React.FC = () => {
 
   useEffect(() => {
     let isMounted = true;
-    const loadData = async () => {
-      setLoading(true);
+    const loadData = async (silent = false) => {
+      if (!silent) setLoading(true);
       try {
         const data = await fetchQuestionsFromDB();
         if (isMounted) {
@@ -48,13 +49,62 @@ export const App: React.FC = () => {
       } catch (err) {
         console.error('Gagal mengambil pertanyaan:', err);
       } finally {
-        if (isMounted) setLoading(false);
+        if (isMounted && !silent) setLoading(false);
       }
     };
 
     loadData();
+
+    // Auto sinkron saat layar HP dibuka kembali atau tab laptop diakses
+    const handleSync = () => {
+      if (document.visibilityState === 'visible') {
+        loadData(true);
+      }
+    };
+    window.addEventListener('visibilitychange', handleSync);
+    window.addEventListener('focus', handleSync);
+
+    // Polling periodik (setiap 12 detik) agar pertanyaan dari perangkat lain langsung masuk
+    const interval = setInterval(() => {
+      if (document.visibilityState === 'visible') {
+        loadData(true);
+      }
+    }, 12000);
+
+    // Supabase Realtime channel subscription
+    let channel: any = null;
+    if (supabase) {
+      try {
+        channel = supabase
+          .channel('schema-db-changes')
+          .on(
+            'postgres_changes',
+            { event: '*', schema: 'public', table: 'questions' },
+            () => {
+              loadData(true);
+            }
+          )
+          .on(
+            'postgres_changes',
+            { event: '*', schema: 'public', table: 'answers' },
+            () => {
+              loadData(true);
+            }
+          )
+          .subscribe();
+      } catch (e) {
+        console.warn('Realtime subscription:', e);
+      }
+    }
+
     return () => {
       isMounted = false;
+      window.removeEventListener('visibilitychange', handleSync);
+      window.removeEventListener('focus', handleSync);
+      clearInterval(interval);
+      if (channel && supabase) {
+        supabase.removeChannel(channel);
+      }
     };
   }, []);
 
