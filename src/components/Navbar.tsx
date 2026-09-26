@@ -70,7 +70,6 @@ export const Navbar: React.FC<NavbarProps> = ({
           >
             <span className={`status-dot ${isConnected ? 'green' : 'yellow'}`}></span>
             <Database size={13} />
-            <span>{isConnected ? 'Supabase' : 'Lokal/Demo'}</span>
           </button>
 
           {/* CTA Buat yang Ingin Menjawab Pertanyaan (Bukan Eksklusif Pakar Saja) */}

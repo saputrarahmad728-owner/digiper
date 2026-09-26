@@ -20,36 +20,6 @@ export const supabase: SupabaseClient | null = isSupabaseConfigured()
 // Mock data awal (kategori menggunakan spasi tanpa tanda #)
 export const INITIAL_QUESTIONS: Question[] = [
   {
-    id: '1',
-    created_at: new Date(Date.now() - 3600000 * 4).toISOString(),
-    farmer_name: 'Pak Joko Widodo',
-    farmer_region: 'Boyolali, Jawa Tengah',
-    crop_type: 'Cabai Rawit Merah',
-    category: 'Hama Tanaman',
-    title: 'Bagaimana cara mengatasi daun cabai keriting dan menggulung ke atas?',
-    content: 'Tanaman cabai rawit saya umur 45 HST daun pucuknya keriting, kaku, dan menggulung ke atas. Tulang daun menguning. Apakah ini kena kutu kebul atau thrips? Bagaimana penanganannya tanpa bahan kimia berlebih?',
-    image_url: 'https://images.unsplash.com/photo-1592417817098-8f3d6910985c?auto=format&fit=crop&w=600&q=80',
-    urgency: 'mendesak',
-    status: 'answered',
-    views: 342,
-    likes: 48,
-    answer: {
-      id: 'ans-1',
-      expert_name: 'Ir. Bambang Trihatmojo, M.Sc.',
-      expert_title: 'Agronom & Pakar Proteksi Tanaman (IPB)',
-      expert_avatar: '',
-      content: 'Salam Pak Joko. Gejala daun keriting menggulung ke atas disertai warna kekuningan umumnya disebabkan oleh serangan Thrips sp. dan tungau (mites). Hama ini mengisap cairan sel daun muda sehingga pertumbuhan sel tidak merata.',
-      action_steps: [
-        'Pasang perangkap lekat kuning (yellow sticky trap) 40 buah per hektar.',
-        'Semprot pestisida nabati rebusan daun mimba + tembakau + sedikit deterjen cair di sore hari (fokus di balik daun).',
-        'Jika populasi parah, gunakan insektisida berbahan aktif Abamektin secara bergantian dengan Imidakloprid dengan dosis tepat.',
-        'Berikan pupuk daun tinggi kalsium dan boron untuk memperkuat sel daun baru.'
-      ],
-      created_at: new Date(Date.now() - 3600000 * 2).toISOString(),
-      likes: 37
-    }
-  },
-  {
     id: '2',
     created_at: new Date(Date.now() - 3600000 * 12).toISOString(),
     farmer_name: 'Ibu Siti Rahmawati',
@@ -140,7 +110,7 @@ export const INITIAL_QUESTIONS: Question[] = [
   }
 ];
 
-const LOCAL_STORAGE_KEY = 'tanya_tani_questions_v2';
+const LOCAL_STORAGE_KEY = 'tanya_tani_questions_v3';
 const AUTH_STORAGE_KEY = 'tanya_tani_expert_auth_v2';
 
 export const getLocalQuestions = (): Question[] => {
@@ -150,7 +120,11 @@ export const getLocalQuestions = (): Question[] => {
       localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(INITIAL_QUESTIONS));
       return INITIAL_QUESTIONS;
     }
-    return JSON.parse(raw);
+    const parsed: Question[] = JSON.parse(raw);
+    // Pastikan pertanyaan lama yang dihapus tidak muncul
+    return parsed.filter(
+      (q) => q.id !== '1' && !(q.title && q.title.toLowerCase().includes('daun cabai keriting'))
+    );
   } catch {
     return INITIAL_QUESTIONS;
   }

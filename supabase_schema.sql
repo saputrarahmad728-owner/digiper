@@ -52,42 +52,10 @@ CREATE POLICY "Public answers update likes" ON public.answers FOR UPDATE USING (
 -- 5. Masukkan Data Sampel / Seed Data Populer (Pertanian Indonesia)
 DO $$
 DECLARE
-    q1_id UUID;
     q2_id UUID;
     q3_id UUID;
     q4_id UUID;
 BEGIN
-    -- Pertanyaan 1: Cabai Keriting
-    INSERT INTO public.questions (farmer_name, farmer_region, crop_type, category, title, content, image_url, urgency, status, views, likes)
-    VALUES (
-        'Pak Joko Widodo', 
-        'Boyolali, Jawa Tengah', 
-        'Cabai Rawit Merah', 
-        'Hama Tanaman', 
-        'Bagaimana cara mengatasi daun cabai keriting dan menggulung ke atas?', 
-        'Tanaman cabai rawit saya umur 45 HST daun pucuknya keriting, kaku, dan menggulung ke atas. Tulang daun menguning. Apakah ini kena kutu kebul atau thrips? Bagaimana penanganannya tanpa bahan kimia berlebih?', 
-        'https://images.unsplash.com/photo-1592417817098-8f3d6910985c?auto=format&fit=crop&w=600&q=80',
-        'mendesak', 
-        'answered', 
-        342, 
-        48
-    ) RETURNING id INTO q1_id;
-
-    INSERT INTO public.answers (question_id, expert_name, expert_title, expert_avatar, content, action_steps, likes)
-    VALUES (
-        q1_id,
-        'Ir. Bambang Trihatmojo, M.Sc.',
-        'Agronom & Pakar Proteksi Tanaman (IPB)',
-        'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=256&q=80',
-        'Salam Pak Joko. Gejala daun keriting menggulung ke atas disertai warna kekuningan umumnya disebabkan oleh serangan Thrips sp. dan tungau (mites). Hama ini mengisap cairan sel daun muda sehingga pertumbuhan sel tidak merata.',
-        ARRAY[
-            'Pasang perangkap lekat kuning (yellow sticky trap) 40 buah per hektar.',
-            'Semprot pestisida nabati rebusan daun mimba + tembakau + sedikit deterjen cair di sore hari (fokus di balik daun).',
-            'Jika populasi parah, gunakan insektisida berbahan aktif Abamektin secara bergantian dengan Imidakloprid dengan dosis tepat.',
-            'Berikan pupuk daun tinggi kalsium dan boron untuk memperkuat sel daun baru.'
-        ],
-        37
-    );
 
     -- Pertanyaan 2: Pupuk Organik Cair
     INSERT INTO public.questions (farmer_name, farmer_region, crop_type, category, title, content, image_url, urgency, status, views, likes)
