@@ -1,0 +1,962 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tanya Tani - Platform Konsultasi & Tanya Jawab Pertanian Modern</title>
+  <meta name="description" content="Tanya Tani adalah platform konsultasi pertanian terpercaya. Tanyakan masalah hama, pupuk organik, bibit unggul, dan hidroponik langsung kepada pakar pertanian." />
+  
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%2316a34a'><path d='M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z'/></svg>" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+
+  <style>
+    :root {
+      --primary-50: #f0fdf4;
+      --primary-100: #dcfce7;
+      --primary-200: #bbf7d0;
+      --primary-300: #86efac;
+      --primary-400: #4ade80;
+      --primary-500: #22c55e;
+      --primary-600: #16a34a;
+      --primary-700: #15803d;
+      --primary-800: #166534;
+      --primary-900: #14532d;
+      --primary-950: #052e16;
+      --bg-main: #f8fafc;
+      --text-main: #0f172a;
+      --text-muted: #64748b;
+      --border-light: #e2e8f0;
+      --radius-sm: 6px;
+      --radius-md: 10px;
+      --radius-lg: 16px;
+      --radius-xl: 24px;
+      --radius-full: 9999px;
+      --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+      --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.07);
+      --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.09);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; font-family: 'Plus Jakarta Sans', system-ui, sans-serif; color: var(--text-main); background-color: var(--bg-main); }
+    body { min-height: 100vh; line-height: 1.6; }
+    a { color: inherit; text-decoration: none; }
+    button { font-family: inherit; cursor: pointer; border: none; background: none; }
+    input, textarea, select { font-family: inherit; color: inherit; }
+
+    .container { width: 100%; max-width: 1140px; margin: 0 auto; padding: 0 1.25rem; }
+
+    /* Navbar */
+    .navbar { position: sticky; top: 0; z-index: 50; background: rgba(255, 255, 255, 0.94); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border-light); }
+    .navbar-inner { display: flex; align-items: center; justify-content: space-between; height: 72px; }
+    .brand-logo { display: flex; align-items: center; gap: 10px; font-weight: 800; font-size: 1.35rem; color: var(--primary-900); }
+    .logo-icon-wrap { width: 40px; height: 40px; border-radius: var(--radius-md); background: linear-gradient(135deg, var(--primary-600), var(--primary-800)); display: flex; align-items: center; justify-content: center; color: #fff; font-size: 1.2rem; }
+    .nav-links { display: flex; align-items: center; gap: 1.75rem; list-style: none; }
+    .nav-link { font-size: 0.95rem; font-weight: 600; color: var(--text-muted); }
+    .nav-link:hover, .nav-link.active { color: var(--primary-700); }
+    .nav-actions { display: flex; align-items: center; gap: 10px; }
+
+    .btn-primary { display: inline-flex; align-items: center; gap: 8px; background: linear-gradient(135deg, var(--primary-600), var(--primary-700)); color: #fff; font-weight: 700; font-size: 0.92rem; padding: 9px 18px; border-radius: var(--radius-full); box-shadow: 0 4px 14px rgba(22, 163, 74, 0.3); transition: all 0.2s; }
+    .btn-primary:hover { background: linear-gradient(135deg, var(--primary-500), var(--primary-600)); transform: translateY(-1px); }
+    .btn-outline { display: inline-flex; align-items: center; gap: 6px; background: transparent; color: var(--primary-800); border: 1.5px solid var(--border-light); font-weight: 600; font-size: 0.88rem; padding: 8px 16px; border-radius: var(--radius-full); }
+    .btn-outline:hover { background: var(--primary-50); border-color: var(--primary-300); }
+
+    .btn-bantu-jawab { display: inline-flex; align-items: center; gap: 6px; background-color: #f0fdf4; color: var(--primary-800); border: 1.5px solid var(--primary-300); font-weight: 700; font-size: 0.88rem; padding: 8px 16px; border-radius: var(--radius-full); transition: all 0.2s; }
+    .btn-bantu-jawab:hover { background-color: var(--primary-600); color: #fff; border-color: var(--primary-600); }
+
+    .expert-nav-profile { display: flex; align-items: center; gap: 8px; padding: 4px 10px; border-radius: var(--radius-full); background: var(--primary-50); border: 1px solid var(--primary-200); }
+    .expert-nav-avatar { width: 28px; height: 28px; border-radius: 50%; object-fit: cover; }
+    .expert-nav-name { font-size: 0.8rem; font-weight: 700; color: var(--primary-950); }
+
+    /* Tabs */
+    .auth-tab-bar { display: flex; background: #f1f5f9; padding: 4px; border-radius: 10px; gap: 4px; margin-bottom: 1rem; }
+    .auth-tab-btn { flex: 1; padding: 8px 12px; border-radius: 6px; font-size: 0.85rem; font-weight: 700; color: #64748b; text-align: center; }
+    .auth-tab-btn.active { background: #fff; color: #166534; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+
+    /* Hero */
+    .hero-section { position: relative; padding: 3.5rem 0 3rem 0; background: linear-gradient(180deg, #ecfdf5 0%, #f0fdf4 40%, var(--bg-main) 100%); border-bottom: 1px solid rgba(22, 163, 74, 0.1); text-align: center; }
+    .hero-badge { display: inline-flex; align-items: center; gap: 8px; background-color: var(--primary-100); color: var(--primary-900); font-size: 0.85rem; font-weight: 700; padding: 5px 14px; border-radius: var(--radius-full); margin-bottom: 1rem; }
+    .hero-title { font-size: 2.75rem; font-weight: 800; line-height: 1.2; color: var(--primary-950); margin-bottom: 0.85rem; }
+    .hero-title span { background: linear-gradient(135deg, var(--primary-600), var(--primary-800)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .hero-desc { font-size: 1.1rem; color: var(--text-muted); margin-bottom: 2rem; max-width: 660px; margin-left: auto; margin-right: auto; }
+
+    .hero-search-wrapper { max-width: 680px; margin: 0 auto; }
+    .hero-search-box { display: flex; align-items: center; background: #fff; padding: 6px 10px; border-radius: var(--radius-full); box-shadow: 0 10px 25px rgba(0, 0, 0, 0.07); border: 2px solid transparent; }
+    .hero-search-box:focus-within { border-color: var(--primary-500); }
+    .hero-search-input { flex: 1; border: none; outline: none; font-size: 1rem; padding: 6px 10px; background: transparent; }
+    .hero-search-btn { background: var(--primary-600); color: #fff; font-weight: 700; padding: 9px 20px; border-radius: var(--radius-full); }
+    .hero-suggestions { display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 0.85rem; font-size: 0.85rem; color: var(--text-muted); flex-wrap: wrap; }
+    .suggestion-chip { background: #fff; border: 1px solid var(--border-light); padding: 3px 10px; border-radius: var(--radius-full); color: var(--text-muted); font-size: 0.78rem; cursor: pointer; }
+
+    .hero-stats-row { display: flex; justify-content: center; gap: 2.5rem; margin-top: 2.25rem; padding-top: 1.5rem; border-top: 1px solid rgba(22, 163, 74, 0.15); }
+    .stat-number { font-size: 1.5rem; font-weight: 800; color: var(--primary-900); }
+    .stat-label { font-size: 0.82rem; color: var(--text-muted); }
+
+    /* Quick Tags */
+    .quick-tags-section { padding: 1.5rem 0 1rem 0; }
+    .quick-tags-wrapper { display: flex; align-items: center; gap: 8px; overflow-x: auto; padding-bottom: 6px; }
+    .tag-label { font-size: 0.85rem; font-weight: 700; color: var(--text-muted); white-space: nowrap; }
+    .tag-pill { display: inline-flex; align-items: center; gap: 6px; padding: 7px 14px; background: #fff; color: var(--text-main); border: 1px solid var(--border-light); border-radius: var(--radius-full); font-size: 0.88rem; font-weight: 600; white-space: nowrap; cursor: pointer; }
+    .tag-pill:hover { background: var(--primary-50); color: var(--primary-800); }
+    .tag-pill.active { background: var(--primary-700); color: #fff; border-color: var(--primary-700); }
+    .tag-count { font-size: 0.72rem; padding: 1px 6px; border-radius: var(--radius-full); background: rgba(0, 0, 0, 0.06); }
+    .tag-pill.active .tag-count { background: rgba(255, 255, 255, 0.25); color: #fff; }
+
+    /* Streamlined Main Section (SS1 removed) */
+    .main-section { padding: 2rem 0 4.5rem 0; }
+    .main-content-streamlined { max-width: 880px; margin: 0 auto; }
+
+    .ask-box-card { background: #fff; border-radius: var(--radius-lg); padding: 1.75rem; box-shadow: var(--shadow-md); border: 1px solid var(--border-light); margin-bottom: 2.25rem; position: relative; overflow: hidden; }
+    .ask-box-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px; background: linear-gradient(90deg, var(--primary-500), var(--primary-700)); }
+    .ask-box-title { font-size: 1.25rem; font-weight: 700; color: var(--primary-950); margin-bottom: 1.25rem; }
+
+    .ask-form { display: flex; flex-direction: column; gap: 1rem; }
+    .form-row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+    .form-group { display: flex; flex-direction: column; gap: 6px; }
+    .form-label { font-size: 0.85rem; font-weight: 700; color: var(--text-main); }
+    .form-input, .form-select, .form-textarea { width: 100%; padding: 10px 14px; border-radius: var(--radius-md); border: 1.5px solid var(--border-light); background-color: #fafbfc; font-size: 0.95rem; }
+    .form-input:focus, .form-select:focus, .form-textarea:focus { outline: none; border-color: var(--primary-600); background-color: #fff; }
+    .form-textarea { min-height: 100px; resize: vertical; }
+
+    .image-upload-dropzone { border: 2px dashed #bbf7d0; background-color: #f0fdf4; padding: 1.25rem; border-radius: var(--radius-md); text-align: center; cursor: pointer; }
+    .image-preview-card { display: flex; align-items: center; gap: 12px; padding: 10px 14px; background-color: #f8fafc; border: 1px solid var(--border-light); border-radius: var(--radius-md); }
+    .image-preview-thumb { width: 50px; height: 50px; border-radius: 8px; object-fit: cover; }
+
+    /* Question Cards */
+    .section-header-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.25rem; }
+    .section-title { font-size: 1.4rem; font-weight: 800; color: var(--primary-950); }
+    .question-list { display: flex; flex-direction: column; gap: 1.25rem; }
+    .question-card { background: #fff; border-radius: var(--radius-lg); padding: 1.5rem; border: 1px solid var(--border-light); box-shadow: var(--shadow-sm); }
+    .question-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); border-color: var(--primary-200); }
+    
+    .question-card-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.75rem; }
+    .author-meta { display: flex; align-items: center; gap: 10px; }
+    .avatar-circle { width: 36px; height: 36px; border-radius: 50%; background: var(--primary-100); color: var(--primary-800); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.88rem; }
+    .author-name { font-size: 0.92rem; font-weight: 700; }
+    .author-sub { font-size: 0.78rem; color: var(--text-muted); }
+    
+    .status-badge { display: inline-flex; align-items: center; gap: 5px; font-size: 0.75rem; font-weight: 700; padding: 3px 9px; border-radius: var(--radius-full); }
+    .status-badge.answered { background-color: var(--primary-100); color: var(--primary-800); }
+    .status-badge.pending { background-color: #fef3c7; color: #92400e; }
+
+    .question-title { font-size: 1.15rem; font-weight: 700; color: var(--primary-950); margin-bottom: 0.5rem; }
+    .question-snippet { font-size: 0.92rem; color: var(--text-muted); margin-bottom: 0.85rem; }
+
+    .card-image-wrap { margin-bottom: 0.85rem; cursor: pointer; border-radius: 8px; overflow: hidden; max-width: 220px; max-height: 140px; }
+    .card-plant-image { width: 100%; height: 100%; object-fit: cover; }
+
+    .expert-preview-box { background: var(--primary-50); border-left: 3px solid var(--primary-600); padding: 10px 14px; border-radius: 0 var(--radius-md) var(--radius-md) 0; margin-bottom: 1rem; display: flex; align-items: flex-start; gap: 10px; }
+    .expert-preview-avatar { width: 32px; height: 32px; border-radius: 50%; object-fit: cover; }
+    .expert-preview-text { font-size: 0.85rem; color: var(--primary-900); }
+
+    .question-footer { display: flex; align-items: center; justify-content: space-between; padding-top: 0.75rem; border-top: 1px solid var(--border-light); }
+    .tag-badge { background: var(--bg-subtle); color: var(--primary-800); font-size: 0.8rem; font-weight: 600; padding: 3px 8px; border-radius: var(--radius-sm); }
+    
+    .btn-view-answer { display: inline-flex; align-items: center; gap: 6px; background: var(--primary-50); color: var(--primary-800); font-weight: 700; font-size: 0.85rem; padding: 7px 14px; border-radius: var(--radius-md); border: 1px solid var(--primary-200); }
+    .btn-view-answer:hover { background: var(--primary-600); color: #fff; }
+    .btn-expert-action { display: inline-flex; align-items: center; gap: 6px; background: #ecfdf5; color: #047857; font-weight: 700; font-size: 0.85rem; padding: 7px 12px; border-radius: var(--radius-md); border: 1px solid #a7f3d0; margin-right: 8px; }
+    .btn-expert-action:hover { background: #047857; color: #fff; }
+
+    /* Modal */
+    .modal-overlay { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.65); backdrop-filter: blur(4px); z-index: 100; display: flex; align-items: center; justify-content: center; padding: 1.25rem; }
+    .modal-container { background: #fff; border-radius: var(--radius-xl); max-width: 680px; width: 100%; max-height: 90vh; overflow-y: auto; box-shadow: var(--shadow-xl); }
+    .modal-header { padding: 1.25rem 1.5rem; display: flex; align-items: flex-start; justify-content: space-between; border-bottom: 1px solid var(--border-light); }
+    .modal-close-btn { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--text-muted); background: var(--bg-subtle); }
+    .modal-body { padding: 1.5rem; }
+    .modal-question-block { background: #f8fafc; border-radius: var(--radius-md); padding: 1.25rem; margin-bottom: 1.5rem; border: 1px solid var(--border-light); }
+
+    /* Footer */
+    .footer { background: var(--primary-950); color: #f8fafc; padding: 3.5rem 0 2rem 0; margin-top: 3rem; }
+    .footer-grid { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 2rem; margin-bottom: 2.5rem; }
+    .footer-bottom { border-top: 1px solid rgba(255, 255, 255, 0.1); padding-top: 1.25rem; display: flex; align-items: center; justify-content: space-between; font-size: 0.8rem; color: #64748b; }
+
+    @media (max-width: 768px) {
+      .nav-links { display: none; }
+      .form-row-2 { grid-template-columns: 1fr; }
+      .hero-title { font-size: 1.8rem; }
+      .footer-grid { grid-template-columns: 1fr; }
+      .footer-bottom { flex-direction: column; gap: 8px; }
+    }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+
+  <script type="text/babel">
+    const { useState, useEffect, useMemo, useRef } = React;
+
+    const INITIAL_DATA = [
+      {
+        id: '1',
+        created_at: new Date(Date.now() - 3600000 * 4).toISOString(),
+        farmer_name: 'Pak Joko Widodo',
+        farmer_region: 'Boyolali, Jawa Tengah',
+        crop_type: 'Cabai Rawit Merah',
+        category: 'Hama Tanaman',
+        title: 'Bagaimana cara mengatasi daun cabai keriting dan menggulung ke atas?',
+        content: 'Tanaman cabai rawit saya umur 45 HST daun pucuknya keriting, kaku, dan menggulung ke atas. Tulang daun menguning. Apakah ini kena kutu kebul atau thrips? Bagaimana penanganannya tanpa bahan kimia berlebih?',
+        image_url: 'https://images.unsplash.com/photo-1592417817098-8f3d6910985c?auto=format&fit=crop&w=600&q=80',
+        urgency: 'mendesak',
+        status: 'answered',
+        views: 342,
+        likes: 48,
+        answer: {
+          id: 'ans-1',
+          expert_name: 'Ir. Bambang Trihatmojo, M.Sc.',
+          expert_title: 'Agronom & Pakar Proteksi Tanaman (IPB)',
+          expert_avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=256&q=80',
+          content: 'Salam Pak Joko. Gejala daun keriting menggulung ke atas disertai warna kekuningan umumnya disebabkan oleh serangan Thrips sp. dan tungau (mites). Hama ini mengisap cairan sel daun muda sehingga pertumbuhan sel tidak merata.',
+          action_steps: [
+            'Pasang perangkap lekat kuning (yellow sticky trap) 40 buah per hektar.',
+            'Semprot pestisida nabati rebusan daun mimba + tembakau + sedikit deterjen cair di sore hari (fokus di balik daun).',
+            'Gunakan insektisida Abamektin bergantian dengan Imidakloprid dengan dosis tepat.',
+            'Berikan pupuk daun tinggi kalsium dan boron untuk memperkuat sel daun baru.'
+          ],
+          likes: 37
+        }
+      },
+      {
+        id: '2',
+        created_at: new Date(Date.now() - 3600000 * 12).toISOString(),
+        farmer_name: 'Ibu Siti Rahmawati',
+        farmer_region: 'Malang, Jawa Timur',
+        crop_type: 'Sayuran Daun & Buah',
+        category: 'Pupuk Organik',
+        title: 'Cara fermentasi Pupuk Organik Cair (POC) dari kohe kambing agar tidak panas?',
+        content: 'Saya punya banyak kotoran kambing kering. Bagaimana cara memfermentasi menjadi pupuk organik cair yang aman dan kaya hara nitrogen untuk fase vegetatif?',
+        image_url: 'https://images.unsplash.com/photo-1585320806297-9794b3e4eeae?auto=format&fit=crop&w=600&q=80',
+        urgency: 'sedang',
+        status: 'answered',
+        views: 215,
+        likes: 29,
+        answer: {
+          id: 'ans-2',
+          expert_name: 'Dr. Ir. Sri Mulyani, M.P.',
+          expert_title: 'Peneliti Mikrobiologi & Kesuburan Tanah',
+          expert_avatar: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=256&q=80',
+          content: 'Halo Ibu Siti. Kohe kambing memiliki kandungan hara yang sangat seimbang. Kunci agar tidak "panas" adalah proses dekomposisi anaerob menggunakan bakteri starter (EM4) dan molase secara tuntas minimal 14–21 hari.',
+          action_steps: [
+            'Siapkan drum 100 liter, masukkan 20 kg kohe kambing halus ke dalam karung goni.',
+            'Campurkan 200 ml EM4 pertanian + 200 ml tetes tebu/molase ke dalam 80 liter air bersih.',
+            'Tutup rapat drum dengan selang aerasi airlock. Tunggu 21 hari hingga aroma menyerupai tape.'
+          ],
+          likes: 24
+        }
+      }
+    ];
+
+    function TanyaTaniApp() {
+      const [questions, setQuestions] = useState(() => {
+        const saved = localStorage.getItem('tanya_tani_v4_data');
+        return saved ? JSON.parse(saved) : INITIAL_DATA;
+      });
+      const [selectedTag, setSelectedTag] = useState('Semua');
+      const [searchQuery, setSearchQuery] = useState('');
+      const [activeModal, setActiveModal] = useState(null);
+
+      // Auth Penjawab (Bisa Login & Daftar Akun)
+      const [currentExpert, setCurrentExpert] = useState(() => {
+        const saved = localStorage.getItem('tanya_tani_expert_user_v4');
+        return saved ? JSON.parse(saved) : null;
+      });
+      const [showAuthModal, setShowAuthModal] = useState(false);
+      const [authTab, setAuthTab] = useState('register'); // 'register' atau 'login'
+      const [authName, setAuthName] = useState('');
+      const [authProfession, setAuthProfession] = useState('');
+      const [authEmail, setAuthEmail] = useState('');
+      const [authPassword, setAuthPassword] = useState('');
+
+      const [questionToAnswer, setQuestionToAnswer] = useState(null);
+      const [answerContent, setAnswerContent] = useState('');
+      const [answerSteps, setAnswerSteps] = useState(['']);
+
+      // Farmer Form (Langsung Tanya Tanpa Login)
+      const [farmerName, setFarmerName] = useState('');
+      const [cropType, setCropType] = useState('');
+      const [category, setCategory] = useState('Hama Tanaman');
+      const [title, setTitle] = useState('');
+      const [content, setContent] = useState('');
+      const [urgency, setUrgency] = useState('sedang');
+      const [uploadedImage, setUploadedImage] = useState(null);
+      const [imageName, setImageName] = useState('');
+      const fileInputRef = useRef(null);
+
+      useEffect(() => {
+        localStorage.setItem('tanya_tani_v4_data', JSON.stringify(questions));
+      }, [questions]);
+
+      useEffect(() => {
+        if (currentExpert) {
+          localStorage.setItem('tanya_tani_expert_user_v4', JSON.stringify(currentExpert));
+        } else {
+          localStorage.removeItem('tanya_tani_expert_user_v4');
+        }
+      }, [currentExpert]);
+
+      const handleFileChange = (e) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+        setImageName(file.name);
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          setUploadedImage(reader.result);
+        };
+        reader.readAsDataURL(file);
+      };
+
+      const handleAddQuestion = (e) => {
+        e.preventDefault();
+        if (!farmerName || !title || !content) return;
+
+        const newQ = {
+          id: 'user-' + Date.now(),
+          created_at: new Date().toISOString(),
+          farmer_name: farmerName,
+          farmer_region: 'Indonesia',
+          crop_type: cropType || 'Holtikultura',
+          category: category,
+          title: title,
+          content: content,
+          image_url: uploadedImage || null,
+          urgency: urgency,
+          status: 'pending',
+          views: 1,
+          likes: 0
+        };
+
+        setQuestions([newQ, ...questions]);
+        setTitle('');
+        setContent('');
+        setCropType('');
+        setUploadedImage(null);
+        setImageName('');
+        alert('Pertanyaan Anda berhasil dikirim ke antrian pakar tani!');
+      };
+
+      // Handle Submit Autentikasi Penjawab
+      const handleAuthSubmit = (e) => {
+        e.preventDefault();
+        if (!authEmail || !authPassword) return;
+
+        const user = {
+          id: 'expert-' + Date.now(),
+          name: authTab === 'register' ? (authName || 'Penjawab Tani') : (authEmail.split('@')[0] || 'Penjawab Tani'),
+          title: authProfession || 'Kontributor Penjawab Pertanian',
+          avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=256&q=80'
+        };
+
+        setCurrentExpert(user);
+        setShowAuthModal(false);
+        alert(authTab === 'register' ? 'Pendaftaran berhasil! Anda kini dapat menjawab pertanyaan.' : 'Berhasil masuk akun penjawab!');
+      };
+
+      const handleRequestAnswer = (q) => {
+        if (!currentExpert) {
+          setQuestionToAnswer(q);
+          setShowAuthModal(true);
+        } else {
+          setQuestionToAnswer(q);
+        }
+      };
+
+      const handleSubmitAnswer = (e) => {
+        e.preventDefault();
+        if (!answerContent || !questionToAnswer) return;
+
+        const newAns = {
+          id: 'ans-' + Date.now(),
+          expert_name: currentExpert.name,
+          expert_title: currentExpert.title,
+          expert_avatar: currentExpert.avatar,
+          content: answerContent,
+          action_steps: answerSteps.filter(s => s.trim() !== ''),
+          likes: 0
+        };
+
+        setQuestions(questions.map(q => {
+          if (q.id === questionToAnswer.id) {
+            return { ...q, status: 'answered', answer: newAns };
+          }
+          return q;
+        }));
+
+        setAnswerContent('');
+        setAnswerSteps(['']);
+        setQuestionToAnswer(null);
+        alert('Jawaban berhasil diterbitkan!');
+      };
+
+      const handleLike = (answerId) => {
+        setQuestions(questions.map(q => {
+          if (q.answer && q.answer.id === answerId) {
+            return {
+              ...q,
+              answer: { ...q.answer, likes: q.answer.likes + 1 }
+            };
+          }
+          return q;
+        }));
+        if (activeModal && activeModal.answer && activeModal.answer.id === answerId) {
+          setActiveModal({
+            ...activeModal,
+            answer: { ...activeModal.answer, likes: activeModal.answer.likes + 1 }
+          });
+        }
+      };
+
+      const filtered = useMemo(() => {
+        return questions.filter(q => {
+          const matchTag = selectedTag === 'Semua' || q.category === selectedTag;
+          if (!searchQuery.trim()) return matchTag;
+          const s = searchQuery.toLowerCase();
+          return matchTag && (
+            q.title.toLowerCase().includes(s) ||
+            q.content.toLowerCase().includes(s) ||
+            (q.crop_type && q.crop_type.toLowerCase().includes(s))
+          );
+        });
+      }, [questions, selectedTag, searchQuery]);
+
+      const tags = ['Semua', 'Hama Tanaman', 'Pupuk Organik', 'Hidroponik', 'Pascapanen', 'Bibit Unggul'];
+
+      return (
+        <div>
+          {/* Header */}
+          <header className="navbar">
+            <div className="container navbar-inner">
+              <div className="brand-logo">
+                <div className="logo-icon-wrap">🌱</div>
+                <span>Tanya Tani</span>
+              </div>
+              <ul className="nav-links">
+                <li><a href="#" className="nav-link active">Beranda</a></li>
+                <li><a href="#konsultasi" className="nav-link">Tanya Ahli</a></li>
+                <li><a href="#daftar" className="nav-link">Komunitas</a></li>
+                <li><a href="#daftar" className="nav-link">Artikel</a></li>
+              </ul>
+              <div className="nav-actions">
+                {currentExpert ? (
+                  <div className="expert-nav-profile">
+                    <img src={currentExpert.avatar} className="expert-nav-avatar" alt="pakar" />
+                    <span className="expert-nav-name">{currentExpert.name.split(',')[0]}</span>
+                    <button
+                      onClick={() => setCurrentExpert(null)}
+                      style={{ fontSize: '0.75rem', color: '#ef4444', fontWeight: 700 }}
+                      title="Keluar"
+                    >
+                      (Keluar)
+                    </button>
+                  </div>
+                ) : (
+                  <button className="btn-bantu-jawab" onClick={() => setShowAuthModal(true)}>
+                    🤝 Bantu Jawab
+                  </button>
+                )}
+                <button
+                  className="btn-primary"
+                  onClick={() => document.getElementById('konsultasi').scrollIntoView({ behavior: 'smooth' })}
+                >
+                  💬 Mulai Bertanya
+                </button>
+              </div>
+            </div>
+          </header>
+
+          {/* Hero */}
+          <section className="hero-section">
+            <div className="container">
+              <div className="hero-badge">✨ Platform Konsultasi Pertanian Terpercaya #1</div>
+              <h1 className="hero-title">
+                Solusi Cepat untuk Masalah <span>Pertanian Anda</span>
+              </h1>
+              <p className="hero-desc">
+                Petani dapat langsung bertanya tanpa perlu login. Siapapun yang memiliki keahlian pertanian dapat bergabung membantu menjawab.
+              </p>
+
+              <div className="hero-search-wrapper">
+                <div className="hero-search-box">
+                  <span style={{ padding: '0 10px', fontSize: '1.2rem' }}>🔍</span>
+                  <input
+                    type="text"
+                    className="hero-search-input"
+                    placeholder="Cari solusi: hama padi, pupuk organik, bibit cabai..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                  />
+                  <button className="hero-search-btn">Cari Solusi</button>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          {/* Quick Tags */}
+          <section className="quick-tags-section">
+            <div className="container">
+              <div className="quick-tags-wrapper">
+                <span className="tag-label">🏷️ Kategori:</span>
+                {tags.map((t) => (
+                  <button
+                    key={t}
+                    className={`tag-pill ${selectedTag === t ? 'active' : ''}`}
+                    onClick={() => setSelectedTag(t)}
+                  >
+                    <span>{t}</span>
+                    <span className="tag-count">
+                      {t === 'Semua' ? questions.length : questions.filter(q => q.category === t).length}
+                    </span>
+                  </button>
+                ))}
+              </div>
+            </div>
+          </section>
+
+          {/* Main Content (Streamlined - SS1 component removed) */}
+          <section className="main-section" id="daftar">
+            <div className="container">
+              <div className="main-content-streamlined">
+                {/* Form Konsultasi Petani */}
+                <div id="konsultasi" className="ask-box-card">
+                  <h2 className="ask-box-title">📝 Tulis Pertanyaan Masalah Tanaman (Gratis Tanpa Login)</h2>
+                  <form onSubmit={handleAddQuestion} className="ask-form">
+                    <div className="form-row-2">
+                      <div className="form-group">
+                        <label className="form-label">Nama Petani / Kelompok Tani *</label>
+                        <input
+                          type="text"
+                          className="form-input"
+                          placeholder="Contoh: Pak Joko Widodo"
+                          value={farmerName}
+                          onChange={(e) => setFarmerName(e.target.value)}
+                          required
+                        />
+                      </div>
+                      <div className="form-group">
+                        <label className="form-label">Komoditas / Tanaman *</label>
+                        <input
+                          type="text"
+                          className="form-input"
+                          placeholder="Contoh: Cabai Rawit Merah"
+                          value={cropType}
+                          onChange={(e) => setCropType(e.target.value)}
+                          required
+                        />
+                      </div>
+                    </div>
+
+                    <div className="form-row-2">
+                      <div className="form-group">
+                        <label className="form-label">Kategori *</label>
+                        <select className="form-select" value={category} onChange={(e) => setCategory(e.target.value)}>
+                          <option value="Hama Tanaman">Hama Tanaman</option>
+                          <option value="Pupuk Organik">Pupuk Organik</option>
+                          <option value="Hidroponik">Hidroponik</option>
+                          <option value="Pascapanen">Pascapanen</option>
+                          <option value="Bibit Unggul">Bibit Unggul</option>
+                        </select>
+                      </div>
+                      <div className="form-group">
+                        <label className="form-label">Tingkat Urgensi</label>
+                        <select className="form-select" value={urgency} onChange={(e) => setUrgency(e.target.value)}>
+                          <option value="rendah">Rendah (Pencegahan)</option>
+                          <option value="sedang">Sedang (Gejala Awal)</option>
+                          <option value="mendesak">Mendesak (Serangan Masif)</option>
+                        </select>
+                      </div>
+                    </div>
+
+                    <div className="form-group">
+                      <label className="form-label">Inti Pertanyaan *</label>
+                      <input
+                        type="text"
+                        className="form-input"
+                        placeholder="Misal: Bagaimana cara mengatasi daun cabai keriting dan menguning?"
+                        value={title}
+                        onChange={(e) => setTitle(e.target.value)}
+                        required
+                      />
+                    </div>
+
+                    <div className="form-group">
+                      <label className="form-label">Detail Gejala Lapangan *</label>
+                      <textarea
+                        className="form-textarea"
+                        placeholder="Jelaskan kondisi tanaman, umur tanam, dan gejala di lapangan..."
+                        value={content}
+                        onChange={(e) => setContent(e.target.value)}
+                        required
+                      ></textarea>
+                    </div>
+
+                    <div className="form-group">
+                      <label className="form-label">📸 Unggah Foto Gejala / Hama (Opsional):</label>
+                      {!uploadedImage ? (
+                        <div className="image-upload-dropzone" onClick={() => fileInputRef.current?.click()}>
+                          <div style={{ fontWeight: 700, color: '#15803d' }}>Pilih Foto Tanaman dari Galeri / Kamera</div>
+                          <div style={{ fontSize: '0.78rem', color: '#64748b' }}>Format JPG, PNG, atau WEBP</div>
+                          <input
+                            ref={fileInputRef}
+                            type="file"
+                            accept="image/*"
+                            style={{ display: 'none' }}
+                            onChange={handleFileChange}
+                          />
+                        </div>
+                      ) : (
+                        <div className="image-preview-card">
+                          <img src={uploadedImage} className="image-preview-thumb" alt="preview" />
+                          <div style={{ flex: 1, fontSize: '0.85rem' }}>
+                            <strong>{imageName}</strong> (Siap dikirim)
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() => { setUploadedImage(null); setImageName(''); }}
+                            style={{ color: '#ef4444', fontWeight: 700 }}
+                          >
+                            Hapus
+                          </button>
+                        </div>
+                      )}
+                    </div>
+
+                    <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                      <button type="submit" className="btn-primary">
+                        Kirim Pertanyaan Petani 📤
+                      </button>
+                    </div>
+                  </form>
+                </div>
+
+                {/* Header Pertanyaan */}
+                <div className="section-header-row">
+                  <h2 className="section-title">💡 Diskusi & Jawaban Petani</h2>
+                  <span style={{ color: '#64748b' }}>{filtered.length} Kasus</span>
+                </div>
+
+                {/* List Pertanyaan */}
+                <div className="question-list">
+                  {filtered.map((q) => (
+                    <article key={q.id} className="question-card">
+                      <div className="question-card-top">
+                        <div className="author-meta">
+                          <div className="avatar-circle">{q.farmer_name.charAt(0)}</div>
+                          <div>
+                            <div className="author-name">{q.farmer_name}</div>
+                            <div className="author-sub">{q.crop_type} • {q.farmer_region}</div>
+                          </div>
+                        </div>
+                        <span className={`status-badge ${q.status === 'answered' ? 'answered' : 'pending'}`}>
+                          {q.status === 'answered' ? '✅ Sudah Terjawab' : '⏳ Menunggu Solusi'}
+                        </span>
+                      </div>
+
+                      <h3 className="question-title">{q.title}</h3>
+                      <p className="question-snippet">{q.content}</p>
+
+                      {q.image_url && (
+                        <div className="card-image-wrap" onClick={() => setActiveModal(q)}>
+                          <img src={q.image_url} className="card-plant-image" alt="foto gejala" />
+                        </div>
+                      )}
+
+                      {q.answer && (
+                        <div className="expert-preview-box">
+                          <img src={q.answer.expert_avatar} className="expert-preview-avatar" alt="pakar" />
+                          <div className="expert-preview-text">
+                            <strong>{q.answer.expert_name}: </strong>
+                            "{q.answer.content.slice(0, 110)}..."
+                          </div>
+                        </div>
+                      )}
+
+                      <div className="question-footer">
+                        <span className="tag-badge">{q.category}</span>
+                        <div>
+                          {q.status !== 'answered' && (
+                            <button className="btn-expert-action" onClick={() => handleRequestAnswer(q)}>
+                              🤝 {currentExpert ? 'Tuliskan Jawaban' : 'Bantu Jawab'}
+                            </button>
+                          )}
+                          <button className="btn-view-answer" onClick={() => setActiveModal(q)}>
+                            {q.status === 'answered' ? 'Lihat Jawaban ➔' : 'Detail Kasus ➔'}
+                          </button>
+                        </div>
+                      </div>
+                    </article>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </section>
+
+          {/* Modal Jawaban */}
+          {activeModal && (
+            <div className="modal-overlay" onClick={() => setActiveModal(null)}>
+              <div className="modal-container" onClick={(e) => e.stopPropagation()}>
+                <div className="modal-header">
+                  <div>
+                    <span className="tag-badge">{activeModal.category}</span>
+                    <h2 style={{ fontSize: '1.25rem', marginTop: '4px' }}>{activeModal.title}</h2>
+                  </div>
+                  <button className="modal-close-btn" onClick={() => setActiveModal(null)}>✕</button>
+                </div>
+                <div className="modal-body">
+                  <div className="modal-question-block">
+                    <p style={{ fontSize: '0.85rem', color: '#64748b', marginBottom: '6px' }}>
+                      Petani: <strong>{activeModal.farmer_name}</strong> ({activeModal.crop_type})
+                    </p>
+                    <p>{activeModal.content}</p>
+                    {activeModal.image_url && (
+                      <div style={{ marginTop: '10px' }}>
+                        <span style={{ fontSize: '0.78rem', color: '#64748b', display: 'block', marginBottom: '4px' }}>
+                          📸 Foto Gejala yang Diunggah Petani:
+                        </span>
+                        <img src={activeModal.image_url} style={{ maxHeight: '250px', borderRadius: '8px' }} alt="gejala" />
+                      </div>
+                    )}
+                  </div>
+
+                  {activeModal.answer ? (
+                    <div style={{ background: '#fff', border: '2px solid #bbf7d0', borderRadius: '12px', padding: '1.25rem' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '1rem' }}>
+                        <img src={activeModal.answer.expert_avatar} style={{ width: '48px', height: '48px', borderRadius: '50%' }} alt="pakar" />
+                        <div>
+                          <h4 style={{ fontWeight: 800 }}>{activeModal.answer.expert_name}</h4>
+                          <p style={{ color: '#16a34a', fontSize: '0.85rem', fontWeight: 600 }}>{activeModal.answer.expert_title}</p>
+                        </div>
+                      </div>
+                      <p style={{ lineHeight: 1.6, marginBottom: '1rem' }}>{activeModal.answer.content}</p>
+                      
+                      {activeModal.answer.action_steps && (
+                        <div style={{ background: '#f0fdf4', padding: '1rem', borderRadius: '8px', border: '1px solid #bbf7d0' }}>
+                          <strong style={{ display: 'block', marginBottom: '8px', color: '#14532d' }}>
+                            🌱 Langkah Penanganan Lapangan:
+                          </strong>
+                          {activeModal.answer.action_steps.map((step, i) => (
+                            <div key={i} style={{ display: 'flex', gap: '8px', marginBottom: '6px', fontSize: '0.9rem' }}>
+                              <span style={{ color: '#15803d', fontWeight: 800 }}>{i + 1}.</span>
+                              <span>{step}</span>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+
+                      <div style={{ marginTop: '1.25rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <button className="btn-outline" onClick={() => handleLike(activeModal.answer.id)}>
+                          👍 Bermanfaat ({activeModal.answer.likes})
+                        </button>
+                        <span style={{ fontSize: '0.8rem', color: '#64748b' }}>Tervalidasi GAP</span>
+                      </div>
+                    </div>
+                  ) : (
+                    <div style={{ textAlign: 'center', padding: '2rem', background: '#fffbeb', borderRadius: '12px' }}>
+                      <p style={{ color: '#92400e', fontWeight: 700, marginBottom: '1rem' }}>
+                        Pertanyaan ini belum ada yang menjawab. Ingin membantu memberikan solusi?
+                      </p>
+                      <button
+                        className="btn-primary"
+                        onClick={() => {
+                          const target = activeModal;
+                          setActiveModal(null);
+                          handleRequestAnswer(target);
+                        }}
+                      >
+                        Bantu Jawab Kasus Ini
+                      </button>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Modal Autentikasi Penjawab (Bisa Daftar Akun Baru & Masuk) */}
+          {showAuthModal && (
+            <div className="modal-overlay" onClick={() => setShowAuthModal(false)}>
+              <div className="modal-container" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '460px' }}>
+                <div className="modal-header">
+                  <h3>🤝 Gabung Menjawab Pertanyaan</h3>
+                  <button className="modal-close-btn" onClick={() => setShowAuthModal(false)}>✕</button>
+                </div>
+                <div className="modal-body">
+                  <p style={{ fontSize: '0.82rem', color: '#15803d', background: '#f0fdf4', padding: '8px 10px', borderRadius: '6px', marginBottom: '1rem' }}>
+                    🌾 Petani tidak perlu membuat akun untuk bertanya. Akun ini khusus bagi Anda yang ingin <strong>berkontribusi menjawab pertanyaan</strong>.
+                  </p>
+
+                  <div className="auth-tab-bar">
+                    <button
+                      type="button"
+                      className={`auth-tab-btn ${authTab === 'register' ? 'active' : ''}`}
+                      onClick={() => setAuthTab('register')}
+                    >
+                      Daftar Akun Baru
+                    </button>
+                    <button
+                      type="button"
+                      className={`auth-tab-btn ${authTab === 'login' ? 'active' : ''}`}
+                      onClick={() => setAuthTab('login')}
+                    >
+                      Sudah Punya Akun (Masuk)
+                    </button>
+                  </div>
+
+                  <form onSubmit={handleAuthSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                    {authTab === 'register' && (
+                      <>
+                        <div className="form-group">
+                          <label className="form-label">Nama Lengkap & Gelar (Bila ada) *</label>
+                          <input
+                            type="text"
+                            className="form-input"
+                            placeholder="Contoh: Ir. Hendra Saputra atau Budi (Praktisi)"
+                            value={authName}
+                            onChange={(e) => setAuthName(e.target.value)}
+                            required
+                          />
+                        </div>
+                        <div className="form-group">
+                          <label className="form-label">Keahlian / Profesi *</label>
+                          <input
+                            type="text"
+                            className="form-input"
+                            placeholder="Misal: Penyuluh Tani / Agronom / Praktisi Hidroponik"
+                            value={authProfession}
+                            onChange={(e) => setAuthProfession(e.target.value)}
+                            required
+                          />
+                        </div>
+                      </>
+                    )}
+
+                    <div className="form-group">
+                      <label className="form-label">Email *</label>
+                      <input
+                        type="email"
+                        className="form-input"
+                        placeholder="email@contoh.id"
+                        value={authEmail}
+                        onChange={(e) => setAuthEmail(e.target.value)}
+                        required
+                      />
+                    </div>
+
+                    <div className="form-group">
+                      <label className="form-label">Password *</label>
+                      <input
+                        type="password"
+                        className="form-input"
+                        placeholder="Minimal 6 karakter"
+                        value={authPassword}
+                        onChange={(e) => setAuthPassword(e.target.value)}
+                        required
+                      />
+                    </div>
+
+                    <button type="submit" className="btn-primary" style={{ marginTop: '6px' }}>
+                      {authTab === 'register' ? 'Daftar & Mulai Menjawab' : 'Masuk Akun Penjawab'}
+                    </button>
+                  </form>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Modal Tulis Jawaban */}
+          {questionToAnswer && currentExpert && (
+            <div className="modal-overlay" onClick={() => setQuestionToAnswer(null)}>
+              <div className="modal-container" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '600px' }}>
+                <div className="modal-header">
+                  <h3>✍️ Tuliskan Jawaban & Solusi</h3>
+                  <button className="modal-close-btn" onClick={() => setQuestionToAnswer(null)}>✕</button>
+                </div>
+                <div className="modal-body">
+                  <div style={{ background: '#f8fafc', padding: '10px', borderRadius: '8px', marginBottom: '1rem' }}>
+                    <strong>Kasus: </strong>{questionToAnswer.title} ({questionToAnswer.crop_type})
+                  </div>
+                  <form onSubmit={handleSubmitAnswer} style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                    <div className="form-group">
+                      <label className="form-label">Diagnosa & Solusi Teknis *</label>
+                      <textarea
+                        className="form-textarea"
+                        placeholder="Jelaskan analisis penyebab dan rekomendasi ilmiah/praktis penanganan..."
+                        value={answerContent}
+                        onChange={(e) => setAnswerContent(e.target.value)}
+                        required
+                      ></textarea>
+                    </div>
+                    <div className="form-group">
+                      <label className="form-label">Langkah Penanganan Praktis:</label>
+                      {answerSteps.map((step, idx) => (
+                        <input
+                          key={idx}
+                          type="text"
+                          className="form-input"
+                          style={{ marginBottom: '6px' }}
+                          placeholder={`Langkah ke-${idx + 1}`}
+                          value={step}
+                          onChange={(e) => {
+                            const updated = [...answerSteps];
+                            updated[idx] = e.target.value;
+                            setAnswerSteps(updated);
+                          }}
+                        />
+                      ))}
+                      <button
+                        type="button"
+                        onClick={() => setAnswerSteps([...answerSteps, ''])}
+                        style={{ color: '#16a34a', fontSize: '0.82rem', fontWeight: 700 }}
+                      >
+                        + Tambah Langkah
+                      </button>
+                    </div>
+                    <button type="submit" className="btn-primary">
+                      Terbitkan Jawaban 🚀
+                    </button>
+                  </form>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Footer */}
+          <footer className="footer">
+            <div className="container">
+              <div className="footer-grid">
+                <div>
+                  <h3>🌱 Tanya Tani</h3>
+                  <p style={{ color: '#94a3b8', fontSize: '0.85rem' }}>
+                    Platform konsultasi pertanian modern nusantara. Menghubungkan petani cerdas dengan para pemberi solusi pertanian terpercaya.
+                  </p>
+                </div>
+                <div>
+                  <h4>Kategori</h4>
+                  <ul style={{ listStyle: 'none', color: '#94a3b8', fontSize: '0.85rem' }}>
+                    <li>Hama Tanaman</li>
+                    <li>Pupuk Organik</li>
+                    <li>Hidroponik</li>
+                  </ul>
+                </div>
+                <div>
+                  <h4>Kontak</h4>
+                  <p style={{ color: '#94a3b8', fontSize: '0.85rem' }}>halo@tanyatani.id</p>
+                </div>
+              </div>
+              <div className="footer-bottom">
+                <div>© 2026 Tanya Tani Indonesia. Hak Cipta Dilindungi.</div>
+                <div>Pertanian Modern Ramah Lingkungan</div>
+              </div>
+            </div>
+          </footer>
+        </div>
+      );
+    }
+
+    ReactDOM.createRoot(document.getElementById('root')).render(<TanyaTaniApp />);
+  </script>
+</body>
+</html>
